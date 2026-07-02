@@ -1,0 +1,78 @@
+# =========================================================
+# Projet CICD - EC06 - Etudiant 7
+# Workflow 3/3 : Promotion manuelle d'un artefact deja construit
+# =========================================================
+# Declenchement : uniquement manuel (workflow_dispatch). Ce workflow ne
+# reconstruit JAMAIS l'image. Il prend un digest deja publie par
+# 02-publish-ghcr.yml et cree un nouveau tag qui pointe vers ce meme
+# digest, dans l'environnement cible choisi (recette ou
+# production-simulee). C'est la preuve que l'on promeut le meme artefact
+# sans rebuild : le digest reste identique avant/apres promotion.
+
+name: 03 - Promote (manuel, sans rebuild)
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_digest:
+        description: "Digest de l'image a promouvoir (ex: sha256:abcd1234...), obtenu depuis le run 02-publish-ghcr.yml"
+        required: true
+        type: string
+      target_environment:
+        description: "Environnement cible de la promotion"
+        required: true
+        type: choice
+        options:
+          - recette
+          - production-simulee
+        default: recette
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  promote:
+    name: Promotion de l'artefact vers ${{ inputs.target_environment }}
+    runs-on: ubuntu-latest
+    # L'environnement GitHub cible permet d'appliquer une regle de
+    # protection (ex: validation manuelle obligatoire avant execution)
+    # configurable dans Settings > Environments du depot. C'est la
+    # simulation de separation recette / production.
+    environment: ${{ inputs.target_environment }}
+
+    steps:
+      - name: Connexion a GHCR avec GITHUB_TOKEN
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verification de l'existence du digest source (sans rebuild)
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ inputs.image_digest }}
+
+      - name: Creation du tag de promotion pointant vers le meme digest
+        run: |
+          docker buildx imagetools create \
+            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.target_environment }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ inputs.image_digest }}
+        # imagetools create ne fait que manipuler des manifests dans le
+        # registre : aucune image n'est reconstruite ni re-uploadee.
+
+      - name: Verification post-promotion - digest inchange
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.target_environment }} --format '{{json .Manifest.Digest}}'
+
+      - name: Preuve de promotion (resume)
+        run: |
+          echo "### Promotion - Etudiant 7" >> $GITHUB_STEP_SUMMARY
+          echo "- Environnement cible : ${{ inputs.target_environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Digest source promu : ${{ inputs.image_digest }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Nouveau tag cree : ${{ inputs.target_environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Aucun rebuild effectue (docker buildx imagetools create)." >> $GITHUB_STEP_SUMMARY

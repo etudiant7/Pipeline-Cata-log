@@ -1,0 +1,91 @@
+# =========================================================
+# Projet CICD - EC06 - Etudiant 7
+# Workflow 1/3 : Controle automatique + build + test
+# =========================================================
+# Declenchement : a chaque push et pull request. Ce workflow ne publie rien,
+# il verifie uniquement que le projet est sain (controle automatique du
+# projet + construction de l'image + test technique automatise).
+
+name: 01 - CI (build & test)
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build image et test HTTP automatise
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperation du code (checkout)
+        uses: actions/checkout@v4
+
+      - name: Controle basique des fichiers attendus
+        run: |
+          test -f Dockerfile || (echo "Dockerfile manquant" && exit 1)
+          test -f site/index.html || (echo "site/index.html manquant" && exit 1)
+          test -f site/version.json || (echo "site/version.json manquant" && exit 1)
+          echo "Structure du depot conforme."
+
+      - name: Validation du JSON de version
+        run: python3 -c "import json; json.load(open('site/version.json')); print('version.json valide')"
+
+      - name: Build de l'image Docker (local, non publiee)
+        run: docker build -t site-catalog:ci-test .
+
+      - name: Lancement du conteneur
+        run: docker run -d --name ci-test-container -p 8080:80 site-catalog:ci-test
+
+      - name: Attente de disponibilite du service
+        run: |
+          for i in {1..10}; do
+            if curl -sf http://localhost:8080/ > /dev/null; then
+              echo "Service disponible."
+              exit 0
+            fi
+            echo "Tentative $i/10 - service pas encore pret..."
+            sleep 2
+          done
+          echo "Le service n'a jamais repondu."
+          docker logs ci-test-container
+          exit 1
+
+      - name: Test technique automatise - code HTTP 200
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
+          echo "Code HTTP recu : $status"
+          if [ "$status" != "200" ]; then
+            echo "Echec : code HTTP inattendu."
+            exit 1
+          fi
+
+      - name: Test technique automatise - contenu attendu present
+        run: |
+          curl -s http://localhost:8080/ | grep -q "Catal-Log" && echo "Contenu attendu trouve." || (echo "Contenu attendu absent." && exit 1)
+
+      - name: Test de disponibilite du fichier version.json servi
+        run: |
+          curl -sf http://localhost:8080/version.json | grep -q "Etudiant 7" && echo "version.json accessible et coherent." || (echo "version.json non conforme." && exit 1)
+
+      - name: Recuperation des logs du conteneur (preuve)
+        if: always()
+        run: docker logs ci-test-container || true
+
+      - name: Nettoyage
+        if: always()
+        run: docker rm -f ci-test-container || true
+
+      - name: Resume dans GitHub Actions (preuve visible)
+        if: success()
+        run: |
+          echo "### Resultat CI - Etudiant 7" >> $GITHUB_STEP_SUMMARY
+          echo "- Build Docker : OK" >> $GITHUB_STEP_SUMMARY
+          echo "- Test HTTP automatise : OK (200)" >> $GITHUB_STEP_SUMMARY
+          echo "- Contenu du site verifie : OK" >> $GITHUB_STEP_SUMMARY
