@@ -46,7 +46,6 @@ docs/                            Documentation complète (cadrage, sécurité,
 | [docs/07-limites-et-tests.md](docs/07-limites-et-tests.md) | Limites, tests complémentaires, choix personnels |
 | [docs/08-compte-rendu-final.md](docs/08-compte-rendu-final.md) | Compte rendu final personnel |
 
-## Important — avant le rendu
 
 Ce dépôt fournit la structure complète, le code et les workflows du projet. Les preuves
 d'exécution réelles (liens vers les runs GitHub Actions, captures d'écran GHCR, tag et digest
