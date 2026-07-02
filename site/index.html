@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catal-Log | Projet CICD - EC06</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg), #1e293b);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header p { color: var(--muted); margin-top: 8px; }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px 32px;
+      max-width: 720px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .card h2 {
+      color: var(--accent);
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(56,189,248,0.15);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      margin: 4px 4px 0 0;
+      border: 1px solid rgba(56,189,248,0.3);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    td { padding: 6px 0; color: var(--muted); }
+    td.val { color: var(--text); text-align: right; font-weight: 600; }
+    footer { color: var(--muted); font-size: 0.8rem; margin-top: 10px; text-align: center; }
+    #env-badge {
+      background: rgba(34,197,94,0.15);
+      color: var(--accent-2);
+      border-color: rgba(34,197,94,0.3);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Catal-Log</h1>
+    <p>Chaîne CI/CD conteneurisée &mdash; Projet EC06 (RNCP39611 BC02)</p>
+  </header>
+
+  <div class="card">
+    <h2>Statut du service</h2>
+    <table>
+      <tr><td>Application</td><td class="val">site-catalog</td></tr>
+      <tr><td>Serveur</td><td class="val">Nginx (conteneur Docker)</td></tr>
+      <tr><td>Environnement</td><td class="val"><span id="env-value">production-simulee</span></td></tr>
+      <tr><td>Auteur du projet</td><td class="val">Etudiant 7</td></tr>
+    </table>
+    <div style="margin-top:14px;">
+      <span class="badge">GitHub Actions</span>
+      <span class="badge">Docker</span>
+      <span class="badge">GHCR</span>
+      <span class="badge" id="env-badge">CI/CD</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Objectif du projet</h2>
+    <p style="color:var(--muted); line-height:1.5;">
+      Ce site statique simple est le support fonctionnel d'une chaîne d'intégration et de déploiement continu :
+      contrôle automatique, construction d'image Docker, tests automatisés, publication sur GitHub Container
+      Registry (GHCR), puis promotion manuelle d'un artefact déjà construit vers une production simulée.
+    </p>
+  </div>
+
+  <footer>
+    Version affichée dynamiquement depuis <code>version.json</code> &mdash; Projet CICD EC06 &mdash; Etudiant 7
+  </footer>
+
+  <script>
+    fetch('version.json')
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('env-value').textContent = data.environment || 'inconnu';
+        document.title = `Catal-Log | ${data.version} (${data.environment})`;
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

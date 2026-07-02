@@ -1,0 +1,11 @@
+{
+  "application": "site-catalog",
+  "version": "1.0.0",
+  "auteur": "Etudiant 7",
+  "contexte": "EC06 - Mise en place d'un systeme d'automatisation d'integration et de deploiement continu",
+  "formation": "Administrateur Systemes, Reseaux et Cybersecurite - RNCP39611",
+  "bloc": "RNCP39611BC02",
+  "environment": "recette",
+  "build_date": "2026-07-02",
+  "description": "Site statique de demonstration servi par Nginx dans le cadre du projet CICD."
+}

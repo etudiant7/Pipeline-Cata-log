@@ -1,0 +1,59 @@
+# =========================================================
+# Projet CICD - EC06 - Etudiant 7
+# compose.yml - Orchestration legere (Docker Compose)
+# =========================================================
+# Ce fichier illustre la competence C13 (orchestration/scaling) SANS mettre
+# en place une orchestration de production reelle (pas de Kubernetes ici).
+# Voir docs/05-orchestration-scaling.md pour l'explication complete des
+# limites et de la simulation de mise a l'echelle.
+#
+# Usage local :
+#   docker compose up --build
+#   docker compose up --build --scale web=2   (simulation de scaling, voir docs)
+#
+# Remarque : en mode --scale web=2, le mapping de port fixe "8080:80" doit
+# etre retire ou remplace par un port dynamique (ex: "80") car deux
+# conteneurs ne peuvent pas partager le meme port hote.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/etudiant7/site-catalog:local
+    container_name: site-catalog-web
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - catalog-net
+
+  # Second service : demontre la coordination de plusieurs conteneurs
+  # (competence C13). Ce service ne fait pas partie du "produit" livre a
+  # l'utilisateur final : c'est un outil d'observation qui interroge
+  # periodiquement le service web et journalise sa disponibilite. Il
+  # illustre une brique de supervision minimale, mentionnee comme piste
+  # d'amelioration vers une vraie production (voir docs/06).
+  monitor:
+    image: curlimages/curl:8.10.1
+    container_name: site-catalog-monitor
+    depends_on:
+      - web
+    networks:
+      - catalog-net
+    restart: unless-stopped
+    entrypoint: >
+      sh -c "while true; do
+        date;
+        curl -s -o /dev/null -w 'HTTP %{http_code} - %{time_total}s\n' http://web:80/ || echo 'web injoignable';
+        sleep 30;
+      done"
+
+networks:
+  catalog-net:
+    driver: bridge
