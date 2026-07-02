@@ -54,12 +54,4 @@ effectifs, etc.) doivent être complétées **après avoir poussé ce dépôt su
 GitHub et exécuté réellement les workflows**. Les emplacements à compléter sont marqués
 `[À COMPLETER PAR L'ÉTUDIANT]` dans les fichiers de `docs/`.
 
-Pensez également à :
 
-1. Remplacer `etudiant7` par votre nom d'utilisateur GitHub réel dans `compose.yml` si vous
-   souhaitez que l'image locale pointe vers votre propre espace GHCR.
-2. Créer les deux environnements GitHub (`recette` et `production-simulee`) dans
-   *Settings > Environments*, et configurer une règle de validation manuelle sur
-   `production-simulee`.
-3. Vérifier que le package GHCR créé est visible (public ou privé selon votre choix) et lié au
-   dépôt.
