@@ -9,7 +9,7 @@
 
 ## 1. Dépôt GitHub individuel
 
-- Lien du dépôt : `[À COMPLETER] https://github.com/<votre-utilisateur>/projet-cicd-ec06-etudiant7`
+- Lien du dépôt : `(https://github.com/etudiant7/Pipeline-Cata-log)`
 
 ## 2. Exécutions GitHub Actions réussies
 
