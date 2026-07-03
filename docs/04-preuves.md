@@ -1,70 +1,72 @@
-# 04 - Preuves d'exécution
+# 04 - Preuves d'execution
 
 **Auteur :** Etudiant 7
 
-> Ce document liste toutes les preuves demandées par le référentiel EC06. Les liens et captures
-> ci-dessous doivent être complétés après avoir poussé ce dépôt sur un compte GitHub personnel et
-> exécuté réellement les workflows : une preuve ne peut être produite que par une exécution
-> effective, elle ne peut pas être pré-remplie à l'avance.
+> Ce document liste toutes les preuves demandees par le referentiel EC06.
 
-## 1. Dépôt GitHub individuel
+## 1. Depot GitHub individuel
 
-- Lien du dépôt : https://github.com/etudiant7/Pipeline-Cata-log
+- Lien du depot : https://github.com/etudiant7/Pipeline-Cata-log
 
-## 2. Exécutions GitHub Actions réussies
+## 2. Executions GitHub Actions reussies
 
 | Workflow | Lien du run | Statut |
 |---|---|---|
-| 01-ci.yml | https://github.com/etudiant7/Pipeline-Cata-log/actions/workflows/01-ci.yml — run #4 "Update 04-preuves.md", commit `1dc0dd4`, branche `main` | ✅ Success (16s) |
-| 02-publish-ghcr.yml | https://github.com/etudiant7/Pipeline-Cata-log/actions/workflows/02-publish-ghcr.yml — run #3 "Update 04-preuves.md", commit `1dc0dd4`, branche `main` | ✅ Success |
-| 03-promote.yml (recette) | commit `38d2b77`, déclenché manuellement, voir section 7 | ✅ Success (12s) |
-| 03-promote.yml (production-simulee) | déclenché manuellement, voir section 8 | ✅ Success (13s) |
+| 01-ci.yml | https://github.com/etudiant7/Pipeline-Cata-log/actions/workflows/01-ci.yml -- run #4 "Update 04-preuves.md", commit `1dc0dd4`, branche `main` | Success (16s) |
+| 02-publish-ghcr.yml | https://github.com/etudiant7/Pipeline-Cata-log/actions/workflows/02-publish-ghcr.yml -- run #3 "Update 04-preuves.md", commit `1dc0dd4`, branche `main` | Success |
+| 03-promote.yml (recette) | commit `38d2b77`, declenche manuellement, voir section 7 | Success (12s) |
+| 03-promote.yml (production-simulee) | declenche manuellement, voir section 8 | Success (13s) |
 
 4 runs au total sur `01-ci.yml` (tous verts) et 3 runs sur `02-publish-ghcr.yml` (tous verts),
-visibles dans l'onglet Actions du dépôt.
+visibles dans l'onglet Actions du depot.
 
-![Liste des runs 01-ci.yml, tous réussis](screenshots/liste-executions-ci.png)
-![Liste des runs 02-publish-ghcr.yml, tous réussis](screenshots/liste-executions-publication-ghcr.png)
+![Liste des runs 01-ci.yml, tous reussis](screenshots/liste-executions-ci.png)
+![Liste des runs 02-publish-ghcr.yml, tous reussis](screenshots/liste-executions-publication-ghcr.png)
 
-## 3. Preuve du build Docker automatisé
+## 3. Preuve du build Docker automatise
 
-- Run `01-ci.yml` #4 (commit `1dc0dd4`) : job "Build image et test HTTP automatisé" — étape
-  "Build de l'image Docker" exécutée avec succès (job complet en 11s). Résumé du run :
+- Run `01-ci.yml` #4 (commit `1dc0dd4`) : job "Build image et test HTTP automatise" -- etape
+  "Build de l'image Docker" executee avec succes (job complet en 11s). Resume du run :
   "Build Docker : OK".
 
-## 4. Preuve du test HTTP automatisé
+## 4. Preuve du test HTTP automatise
 
-- Run `01-ci.yml` #4 : résumé affiché dans `GITHUB_STEP_SUMMARY` —
+- Run `01-ci.yml` #4 : resume affiche dans `GITHUB_STEP_SUMMARY` --
   "Resultat CI - Etudiant 7 : Build Docker : OK / Test HTTP automatise : OK (200) / Contenu du
   site verifie : OK".
 - Code HTTP obtenu : **200**.
-- Capture d'écran : ![Run 01-ci.yml réussi avec résumé du test HTTP](screenshots/execution-ci-reussie.png)
+- Capture d'ecran : ![Run 01-ci.yml reussi avec resume du test HTTP](screenshots/execution-ci-reussie.png)
 
 ## 5. Preuve de publication GHCR
 
-- Run `02-publish-ghcr.yml` #3 (commit `1dc0dd4`) terminé avec succès. Résumé du run :
-  "Publication GHCR - Etudiant 7 — Image : ghcr.io/etudiant7/Pipeline-Cata-log".
-- Build record Docker associé : `etudiant7~Pipeline-Cata-log~TC9WXN.dockerbuild`
-  (ID `TC9WXN`, statut `completed`, durée 2s).
-- Page du package GHCR : non récupérée précisément dans ce document ; le package est
-  consultable depuis l'onglet **Packages** du profil `https://github.com/etudiant7?tab=packages`,
-  l'existence et le contenu de l'image étant déjà prouvés ci-dessus par le run réussi, le tag et
-  le digest.
+- Run `02-publish-ghcr.yml` #3 (commit `1dc0dd4`) termine avec succes. Resume du run :
+  "Publication GHCR - Etudiant 7 -- Image : ghcr.io/etudiant7/Pipeline-Cata-log".
+- Build record Docker associe : `etudiant7~Pipeline-Cata-log~TC9WXN.dockerbuild`
+  (ID `TC9WXN`, statut `completed`, duree 2s).
+- Page du package GHCR : https://github.com/etudiant7/Pipeline-Cata-log/pkgs/container/pipeline-cata-log
+- Note importante sur la mutabilite des tags : le workflow `02-publish-ghcr.yml` se declenche a
+  chaque push sur `main`, donc le tag `recette` (et `latest`) est reattribue a chaque nouvelle
+  publication et ne pointe plus forcement vers le digest `sha256:2292da71...` documente en
+  section 6 au moment de la relecture de ce document. C'est attendu et sans consequence sur la
+  validite de la demonstration : la promotion et la verification decrites dans les sections 7 et
+  8 ont ete faites en ciblant explicitement ce digest precis (identifiant immuable), pas le tag
+  mobile `recette`. Cet exemple illustre d'ailleurs concretement la difference entre un tag
+  (mutable) et un digest (fixe) evoquee dans `08-compte-rendu-final.md`.
 
 ## 6. Tag et digest de l'image
 
-- Tag(s) publiés : `sha-1dc0dd40d3e95e036dd6f07b9cb3d5d445b7f07b`, `recette` (et `latest` car
+- Tag(s) publies : `sha-1dc0dd40d3e95e036dd6f07b9cb3d5d445b7f07b`, `recette` (et `latest` car
   branche `main`).
 - Digest de l'image : `sha256:2292da7177c877d5cb4475bda573f88831e93b294648170175388c1ad00e268e`
-- Commande utilisée pour vérifier :
+- Commande utilisee pour verifier :
   `docker buildx imagetools inspect ghcr.io/etudiant7/pipeline-cata-log@sha256:2292da7177c877d5cb4475bda573f88831e93b294648170175388c1ad00e268e`
-- Capture d'écran : ![Résumé de publication GHCR avec tag et digest](screenshots/resume-publication-ghcr.png)
+- Capture d'ecran : ![Resume de publication GHCR avec tag et digest](screenshots/resume-publication-ghcr.png)
 
-## 7. Preuve de validation en recette simulée
+## 7. Preuve de validation en recette simulee
 
 - Run `03-promote.yml` avec `target_environment = recette` : commit `38d2b77`, branche `main`,
-  déclenché manuellement par `etudiant7`. Statut : ✅ Success (12s).
-- Résultat du job (résumé `GITHUB_STEP_SUMMARY`) :
+  declenche manuellement par `etudiant7`. Statut : Success (12s).
+- Resultat du job (resume `GITHUB_STEP_SUMMARY`) :
   ```
   Promotion - Etudiant 7
   - Environnement cible : recette
@@ -72,12 +74,12 @@ visibles dans l'onglet Actions du dépôt.
   - Nouveau tag cree : recette
   - Aucun rebuild effectue (docker buildx imagetools create).
   ```
-- Capture d'écran : ![Run 03-promote.yml réussi vers recette](screenshots/promotion-recette-reussie.png)
+- Capture d'ecran : ![Run 03-promote.yml reussi vers recette](screenshots/promotion-recette-reussie.png)
 
 ## 8. Preuve de promotion vers production-simulee sans rebuild
 
-- Run `03-promote.yml` avec `target_environment = production-simulee` : déclenché manuellement
-  par `etudiant7`. Statut : ✅ Success (13s). Résumé du job :
+- Run `03-promote.yml` avec `target_environment = production-simulee` : declenche manuellement
+  par `etudiant7`. Statut : Success (13s). Resume du job :
   ```
   Promotion - Etudiant 7
   - Environnement cible : production-simulee
@@ -85,67 +87,58 @@ visibles dans l'onglet Actions du dépôt.
   - Nouveau tag cree : production-simulee
   - Aucun rebuild effectue (docker buildx imagetools create).
   ```
-- Capture d'écran : ![Run 03-promote.yml réussi vers production-simulee](screenshots/promotion-production-simulee-reussie.png)
-- Digest **avant** promotion (publié par `02-publish-ghcr.yml`, tag `recette`) :
+- Capture d'ecran : ![Run 03-promote.yml reussi vers production-simulee](screenshots/promotion-production-simulee-reussie.png)
+- Digest **avant** promotion (publie par `02-publish-ghcr.yml`, tag `recette`) :
   `sha256:2292da7177c877d5cb4475bda573f88831e93b294648170175388c1ad00e268e`
-- Digest **après** promotion (tag `production-simulee`) :
+- Digest **apres** promotion (tag `production-simulee`) :
   `sha256:2292da7177c877d5cb4475bda573f88831e93b294648170175388c1ad00e268e`
-- Vérification : les deux digests sont **strictement identiques** → l'artefact promu en
-  `production-simulee` est exactement le même que celui validé en `recette` (et publié
-  initialement par `02-publish-ghcr.yml`) : aucun rebuild n'a eu lieu à aucune étape.
+- Verification : les deux digests sont **strictement identiques** -> l'artefact promu en
+  `production-simulee` est exactement le meme que celui valide en `recette` : aucun rebuild n'a
+  eu lieu a aucune etape.
 
 ## 9. Extrait / lien vers compose.yml
 
 - Fichier : [`compose.yml`](../compose.yml)
-- Test local exécuté : `docker compose up --build` sur poste personnel (Windows, Docker Desktop /
-  WSL2). Build réussi en local :
-  - Image de base résolue : `docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10`
-  - Étape `COPY site/ /usr/share/nginx/html/` exécutée (cache Docker sur rebuild).
-  - Image locale construite et taguée `ghcr.io/etudiant7/site-catalog:local`, manifest
-    `sha256:fa2e795061a24dac593ae1ff2d176ac455f30e665dd7a007d0a39f8d94a7bb5`.
-  - Au démarrage : `Container site-catalog-web Running`, `Container site-catalog-monitor Running`.
-  - Logs Nginx : requête `GET / HTTP/1.1" 200` confirmée dans `site-catalog-web`.
-  - Logs du service `monitor` : `GET / HTTP/1.1" 200` avec `curl/8.10.1`, confirmant que le
-    second service (`monitor`) interroge bien `web` via le réseau interne `catalog-net` —
-    preuve concrète de la coordination des deux conteneurs (compétence C13).
-- Capture d'écran du site rendu en local (`http://localhost:8080`, badge d'environnement
-  "recette" affiché dynamiquement depuis `version.json`) :
-  ![Site Catal-Log accessible en local](screenshots/site-fonctionnel-en-local.png)
-- Capture d'écran du build : ![Sortie de docker compose up --build](screenshots/construction-image-locale.png)
-- Capture d'écran des logs web + monitor : ![Logs des deux conteneurs](screenshots/journaux-services-web-et-monitor.png)
+- Test local execute : `docker compose up --build` sur poste personnel (Windows, Docker Desktop /
+  WSL2). Build reussi en local, image locale construite et taguee `ghcr.io/etudiant7/site-catalog:local`,
+  manifest `sha256:fa2e795061a24dac593ae1ff2d176ac455f30e665dd7a007d0a39f8d94a7bb5`. Conteneurs
+  `site-catalog-web` et `site-catalog-monitor` demarres et communiquant (logs HTTP 200 confirmes).
+- Capture d'ecran du site rendu en local : ![Site Catal-Log accessible en local](screenshots/site-fonctionnel-en-local.png)
+- Capture d'ecran du build : ![Sortie de docker compose up --build](screenshots/construction-image-locale.png)
+- Capture d'ecran des logs web + monitor : ![Logs des deux conteneurs](screenshots/journaux-services-web-et-monitor.png)
 
 ## 10. Explication de la simulation de scaling et de ses limites
 
-- Voir [`05-orchestration-scaling.md`](05-orchestration-scaling.md).
-- Résultat de `docker compose up --build --scale web=2` (si testé) : `[À COMPLETER PAR L'ÉTUDIANT
-  — non testé à ce stade ; le test réalisé jusqu'ici porte sur le démarrage standard (1 instance
-  web + 1 monitor). Si non testé avant le rendu, l'indiquer explicitement ici et s'appuyer sur
-  l'explication théorique de 05-orchestration-scaling.md.]`
+- Voir [`05-orchestration-scaling.md`](05-orchestration-scaling.md) pour l'explication complete.
+- Resultat de `docker compose up --build --scale web=2` : non teste a son terme dans le temps
+  imparti au projet. Un premier essai a ete fait et a revele que `container_name` fixe sur le
+  service `web` empeche Docker Compose de creer plusieurs instances (erreur `Docker requires
+  each container to have a unique name`). La correction (suppression de `container_name` et du
+  port fixe) est documentee dans `05-orchestration-scaling.md` mais n'a pas ete revalidee par une
+  execution reussie. Ceci est assume comme limite du rendu plutot que presente comme une preuve
+  fournie ; le test realise et documente porte sur le demarrage standard (1 instance `web` + 1
+  `monitor`, voir section 9).
 
 ## 11. Preuve ou justification du test local avec Docker / Docker Compose
 
-- Preuve directe : test local réalisé avec succès via `docker compose up --build` (voir
-  section 9 ci-dessus pour le détail des logs). Environnement : Windows avec Docker Desktop
-  (backend WSL2, kernel `6.6.87.2-microsoft-standard-WSL2` visible dans les logs Nginx). Aucune
-  justification de non-utilisation n'est nécessaire ici : le test local a été effectivement
-  réalisé et documenté.
+- Preuve directe : test local realise avec succes via `docker compose up --build`. Environnement :
+  Windows avec Docker Desktop (backend WSL2). Aucune justification de non-utilisation n'est
+  necessaire ici : le test local a ete effectivement realise et documente.
 
 ## 12. Preuve ou justification de l'utilisation d'une VM personnelle
 
-- Justification de non-utilisation : les tests locaux ont été réalisés directement via Docker
-  Desktop sur Windows (backend WSL2), sans VM personnelle dédiée supplémentaire. Le projet ne
-  nécessite pas de serveur à administrer en continu : les GitHub-hosted runners couvrent
-  l'intégralité du besoin d'exécution automatisée, et WSL2 fournit l'isolation nécessaire pour
-  les tests locaux via Docker. Voir également `07-limites-et-tests.md`.
+- Justification de non-utilisation : les tests locaux ont ete realises directement via Docker
+  Desktop sur Windows (backend WSL2), sans VM personnelle dediee supplementaire. Les GitHub-hosted
+  runners couvrent l'integralite du besoin d'execution automatisee.
 
-## 13. Fiche sécurité minimale
+## 13. Fiche securite minimale
 
-- Voir [`03-securite.md`](03-securite.md) — complétée.
+- Voir [`03-securite.md`](03-securite.md) -- completee.
 
 ## 14. Analyse des trois points obligatoires (secrets, rollback, sauvegarde/restauration)
 
-- Voir [`06-analyse-production-reelle.md`](06-analyse-production-reelle.md) — complétée.
+- Voir [`06-analyse-production-reelle.md`](06-analyse-production-reelle.md) -- completee.
 
 ## 15. Compte rendu final personnel
 
-- Voir [`08-compte-rendu-final.md`](08-compte-rendu-final.md) — complété.
+- Voir [`08-compte-rendu-final.md`](08-compte-rendu-final.md) -- complete.
