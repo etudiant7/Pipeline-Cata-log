@@ -28,24 +28,47 @@ site statique conteneurisé avec Nginx :
 
 ## Ce que ce projet m'a permis de comprendre
 
-`[À COMPLETER PAR L'ÉTUDIANT — réflexion personnelle attendue par le référentiel]`
+Ce projet m'a fait comprendre l'idée centrale d'une chaîne CI/CD : automatiser tout ce qui se
+passe entre "je modifie mon code" et "le site est mis à jour", pour ne plus jamais avoir à faire
+ces étapes à la main.
 
-Quelques pistes à développer avec vos propres mots :
+Concrètement, ça se passe en trois temps. Je pousse mon code dans mon dépôt GitHub. GitHub
+Actions construit alors une image Docker de mon site et vérifie automatiquement qu'elle
+fonctionne (le site répond bien, la page s'affiche). Une fois validée, cette image est publiée
+dans un registre (GHCR), avec une étiquette (un "digest") qui identifie précisément cette version
+de l'image, comme un numéro de série unique. Ensuite, pour passer cette même image en
+"production simulée", je ne la reconstruis pas : je réutilise exactement la même, identifiée par
+ce digest. C'est ce qui garantit que ce qui a été testé est exactement ce qui est mis en ligne,
+sans mauvaise surprise entre les deux.
 
-- Ce que signifie concrètement "promouvoir un artefact sans rebuild", et pourquoi c'est une
-  garantie importante de fiabilité (on teste et on déploie exactement la même chose).
-- La différence entre un tag (mutable, pratique) et un digest (immuable, fiable pour la
-  traçabilité).
-- Pourquoi séparer les workflows par responsabilité (contrôle, publication, promotion) rend la
-  chaîne plus lisible et plus sûre qu'un unique workflow monolithique.
-- Ce que Docker Compose apporte réellement, et ce qu'il ne remplace pas (voir `05-` et `07-`).
-- Les difficultés rencontrées concrètement pendant la réalisation (configuration des
-  permissions GitHub Actions, syntaxe des workflows, tests locaux, etc.) et comment elles ont
-  été résolues.
+J'ai aussi compris pourquoi j'ai séparé le projet en trois étapes distinctes (contrôle/test,
+publication, promotion) plutôt que de tout mettre dans un seul fichier : chaque étape a un rôle
+clair, et surtout, le passage en production reste une action volontaire que je déclenche
+moi-même, jamais automatique. Ça évite qu'une mise en ligne se fasse par erreur.
+
+Enfin, j'ai mieux compris ce qu'apporte réellement Docker Compose : il me permet de faire tourner
+plusieurs petits services ensemble facilement sur ma machine, mais ce n'est pas un vrai outil de
+production capable de répartir la charge entre plusieurs serveurs ou de gérer des pannes — ses
+limites sont expliquées dans `05-orchestration-scaling.md`.
 
 ## Difficultés rencontrées
 
-`[À COMPLETER PAR L'ÉTUDIANT]`
+J'ai eu trois problèmes concrets pendant la réalisation.
+
+Le premier : mon dépôt s'appelle `Pipeline-Cata-log`, avec des majuscules, mais Docker n'accepte
+que des noms d'image en minuscules. Résultat, l'étape de promotion échouait avec une erreur assez
+claire une fois que je l'ai lue attentivement. J'ai corrigé le workflow pour qu'il convertisse
+automatiquement le nom en minuscules avant de l'utiliser.
+
+Le deuxième : en local, mon site ne s'affichait pas alors que les conteneurs tournaient bien. Le
+problème venait du port 8080 déjà utilisé par un autre projet sur ma machine, combiné à une
+configuration de port que j'avais modifiée sans la remettre en place ensuite. Ça m'a appris à
+toujours vérifier les ports affichés par `docker compose ps` avant de chercher plus loin.
+
+Le troisième : la première fois que j'ai mis mon projet sur GitHub via l'interface web, le
+dossier caché contenant mes workflows n'a pas été envoyé du tout, donc rien ne se déclenchait. Il
+a fallu que je recrée ces fichiers directement sur GitHub au bon endroit. Depuis, je sais qu'il
+vaut mieux utiliser `git` en ligne de commande pour ce genre de dossier.
 
 ## Limites assumées du rendu
 
@@ -55,5 +78,9 @@ séparée, pas d'orchestrateur de production (volontairement hors périmètre du
 
 ## Conclusion personnelle
 
-`[À COMPLETER PAR L'ÉTUDIANT — une conclusion courte et personnelle sur ce que vous retenez de
-ce module et comment vous réutiliseriez cette approche sur un projet réel.]`
+Ce que je retiens surtout de ce module, c'est qu'une chaîne CI/CD fiable repose sur quelques
+règles simples plutôt que sur des outils compliqués : ne jamais reconstruire ce qui a déjà été
+testé, garder une trace claire de chaque version publiée, et ne jamais laisser une mise en
+production se déclencher toute seule. Sur un vrai projet, je réutiliserais cette même logique
+(publier une fois, promouvoir sans reconstruire), en l'accompagnant en plus d'un vrai
+environnement de production séparé et d'un contrôle de sécurité automatique des images.
