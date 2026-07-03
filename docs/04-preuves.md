@@ -46,8 +46,10 @@ visibles dans l'onglet Actions du dépôt.
   "Publication GHCR - Etudiant 7 — Image : ghcr.io/etudiant7/Pipeline-Cata-log".
 - Build record Docker associé : `etudiant7~Pipeline-Cata-log~TC9WXN.dockerbuild`
   (ID `TC9WXN`, statut `completed`, durée 2s).
-- Page du package GHCR : `[À COMPLETER — lien direct copié depuis l'onglet "Packages" du profil
-  GitHub, ex: https://github.com/etudiant7?tab=packages]`
+- Page du package GHCR : non récupérée précisément dans ce document ; le package est
+  consultable depuis l'onglet **Packages** du profil `https://github.com/etudiant7?tab=packages`,
+  l'existence et le contenu de l'image étant déjà prouvés ci-dessus par le run réussi, le tag et
+  le digest.
 
 ## 6. Tag et digest de l'image
 
@@ -70,7 +72,7 @@ visibles dans l'onglet Actions du dépôt.
   - Nouveau tag cree : recette
   - Aucun rebuild effectue (docker buildx imagetools create).
   ```
-- Capture d'écran : ![Run 03-promote.yml réussi vers recette](screenshots/03-promote-recette-success.png)
+- Capture d'écran : ![Run 03-promote.yml réussi vers recette](screenshots/promotion-recette-reussie.png)
 
 ## 8. Preuve de promotion vers production-simulee sans rebuild
 
@@ -83,7 +85,7 @@ visibles dans l'onglet Actions du dépôt.
   - Nouveau tag cree : production-simulee
   - Aucun rebuild effectue (docker buildx imagetools create).
   ```
-- Capture d'écran : ![Run 03-promote.yml réussi vers production-simulee](screenshots/03-promote-production-success.png)
+- Capture d'écran : ![Run 03-promote.yml réussi vers production-simulee](screenshots/promotion-production-simulee-reussie.png)
 - Digest **avant** promotion (publié par `02-publish-ghcr.yml`, tag `recette`) :
   `sha256:2292da7177c877d5cb4475bda573f88831e93b294648170175388c1ad00e268e`
 - Digest **après** promotion (tag `production-simulee`) :
@@ -108,9 +110,9 @@ visibles dans l'onglet Actions du dépôt.
     preuve concrète de la coordination des deux conteneurs (compétence C13).
 - Capture d'écran du site rendu en local (`http://localhost:8080`, badge d'environnement
   "recette" affiché dynamiquement depuis `version.json`) :
-  ![Site Catal-Log accessible en local](screenshots/site-local-running.png)
-- Capture d'écran du build : ![Sortie de docker compose up --build](screenshots/compose-up-build.png)
-- Capture d'écran des logs web + monitor : ![Logs des deux conteneurs](screenshots/compose-web-monitor-logs.png)
+  ![Site Catal-Log accessible en local](screenshots/site-fonctionnel-en-local.png)
+- Capture d'écran du build : ![Sortie de docker compose up --build](screenshots/construction-image-locale.png)
+- Capture d'écran des logs web + monitor : ![Logs des deux conteneurs](screenshots/journaux-services-web-et-monitor.png)
 
 ## 10. Explication de la simulation de scaling et de ses limites
 

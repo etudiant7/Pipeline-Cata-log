@@ -4,27 +4,38 @@
 
 ## Test local avec Docker / Docker Compose
 
-`[À COMPLETER PAR L'ÉTUDIANT selon votre environnement réel]`
+Docker était disponible en local (Docker Desktop sous Windows, backend WSL2), donc le test a été
+fait réellement plutôt que justifié en théorie. Commande utilisée : `docker compose up --build`.
 
-Deux cas possibles, à choisir selon la situation réelle :
+Ce test a permis de vérifier concrètement plusieurs choses avant même de pousser sur GitHub :
 
-- **Si Docker est disponible en local** : documenter ici la commande utilisée
-  (`docker compose up --build`), une capture d'écran du site accessible sur
-  `http://localhost:8080`, et le résultat de `docker compose ps`.
-- **Si l'environnement personnel ne permet pas de faire tourner Docker localement** (ex :
-  poste sans droits administrateur, restrictions réseau, machine trop limitée) : documenter
-  précisément la contrainte rencontrée, et s'appuyer sur les tests automatisés exécutés dans
-  GitHub Actions (`01-ci.yml`) comme preuve de fonctionnement, en l'indiquant explicitement ici.
+- l'image se construit sans erreur à partir du `Dockerfile` (résolution de l'image de base
+  `nginx:1.27-alpine`, copie du site) ;
+- les deux services démarrent et restent up (`site-catalog-web` marqué `healthy`,
+  `site-catalog-monitor` en cours d'exécution) ;
+- le site est bien accessible et affiche la page attendue (voir capture
+  `docs/screenshots/site-fonctionnel-en-local.png`) ;
+- les logs confirment que le service `monitor` interroge bien `web` toutes les 30 secondes et
+  reçoit une réponse HTTP 200, preuve que les deux conteneurs communiquent correctement via le
+  réseau interne.
+
+Un souci a été rencontré une fois en cours de route : le site n'était plus accessible sur
+`http://localhost:8080` alors que les conteneurs tournaient. La cause était double : le port 8080
+était déjà utilisé par un autre projet Docker présent sur la machine, et le mapping de port dans
+`compose.yml` avait été retiré entre deux tests (probablement en manipulant le fichier pour
+essayer le scaling). Le correctif a été de remettre le mapping de port et de choisir un port
+libre. Ce test a donc aussi servi à vérifier que `docker compose ps` (colonne PORTS) est le bon
+réflexe de diagnostic avant de chercher plus loin.
 
 ## Utilisation d'une VM personnelle
 
-`[À COMPLETER PAR L'ÉTUDIANT]`
-
-- **Si une VM personnelle est utilisée** (VirtualBox, VMware, Hyper-V, WSL2, etc.) : décrire
-  brièvement sa configuration (OS, ressources) et ce qui y a été testé.
-- **Si aucune VM personnelle n'est utilisée** : justifier ce choix (ex : les GitHub-hosted
-  runners suffisent pour couvrir l'intégralité du besoin du projet, qui ne nécessite pas de
-  serveur à administrer en continu).
+Aucune VM personnelle dédiée (VirtualBox, VMware, Hyper-V) n'a été utilisée en plus de Docker
+Desktop. Justification : Docker Desktop sur Windows s'appuie déjà sur WSL2, qui fournit
+l'isolation nécessaire pour faire tourner les conteneurs localement, sans avoir besoin de monter
+et d'administrer une machine virtuelle séparée. Le projet ne nécessite pas non plus de serveur à
+administrer en continu : les tests automatisés s'exécutent sur les GitHub-hosted runners, qui
+couvrent l'intégralité du besoin de validation continue sans infrastructure supplémentaire à
+maintenir de mon côté.
 
 ## Amélioration graphique minimale du site
 
@@ -43,9 +54,11 @@ En complément du test HTTP principal (code 200), le workflow `01-ci.yml` vérif
 - l'accessibilité de `version.json` via HTTP et la présence de l'identifiant `"Etudiant 7"`
   dedans, ce qui garantit que le bon build (avec le bon contenu) a bien été déployé.
 
-`[À COMPLETER PAR L'ÉTUDIANT] : ajouter ici tout test complémentaire personnel que vous auriez
-mis en place (ex: test de l'en-tête `Content-Type`, test avec `docker scout` ou `trivy`, test de
-temps de réponse, etc.), avec la preuve associée.`
+Aucun test complémentaire supplémentaire (scan de vulnérabilités, test d'en-tête HTTP, test de
+temps de réponse) n'a été ajouté au-delà de ceux listés ci-dessus : ce choix a été fait pour
+rester concentré sur le socle obligatoire dans le temps imparti. C'est identifié comme une piste
+d'amélioration possible plutôt qu'un test réalisé (voir aussi la fiche sécurité,
+`03-securite.md`, qui liste l'absence de scan automatisé comme limite assumée).
 
 ## Amélioration de la traçabilité / automatisation documentaire
 

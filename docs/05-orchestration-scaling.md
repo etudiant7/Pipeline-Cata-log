@@ -35,13 +35,17 @@ Commande utilisée pour simuler un passage à plusieurs instances du service `we
 docker compose up --build --scale web=2
 ```
 
-Remarque technique : le mapping de port fixe (`8080:80`) doit être retiré ou remplacé par un
-port dynamique (`"80"`) avant d'utiliser `--scale`, car deux conteneurs ne peuvent pas être
-liés au même port de l'hôte simultanément.
+Remarque technique : le mapping de port fixe (`8080:80`) et le `container_name` fixe doivent
+être retirés du service `web` avant d'utiliser `--scale`, car un nom de conteneur figé et un
+port hôte fixe empêchent tous les deux Docker Compose de créer plusieurs instances (un premier
+essai sans cette modification a d'ailleurs échoué avec l'erreur `Docker requires each container
+to have a unique name`).
 
-`[À COMPLETER PAR L'ÉTUDIANT] : capture d'écran ou sortie de `docker compose ps` montrant les
-deux instances du service `web` démarrées (`site-catalog-web-1`, `site-catalog-web-2`), et
-éventuellement un test de répartition simple (plusieurs `curl` successifs).`
+Note honnête : ce test de scaling n'a pas été mené à son terme dans le temps imparti au projet.
+La commande a été essayée une première fois et a révélé le problème de `container_name` ci-dessus
+; la correction (suppression de `container_name` et du port fixe) est documentée mais n'a pas
+encore été revalidée par une exécution réussie montrant deux instances `web` actives
+simultanément. C'est assumé comme limite du rendu plutôt que comme preuve fournie.
 
 ## Pourquoi cette simulation ne remplace pas une orchestration de production
 

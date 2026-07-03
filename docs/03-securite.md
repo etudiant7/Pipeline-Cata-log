@@ -38,8 +38,14 @@
   paramètres du dépôt (Settings > Environments), une règle de protection de type
   "Required reviewers" pour l'environnement `production-simulee`. Cela simule une validation
   manuelle obligatoire avant toute mise en production, même simulée.
-- [À COMPLETER PAR L'ÉTUDIANT] : capture d'écran de la configuration de la règle de protection
-  sur l'environnement `production-simulee`.
+- Configuration engagée sur ce dépôt : dans *Settings > Environments > production-simulee*,
+  l'option **"Required reviewers"** a été cochée avec `etudiant7` ajouté comme reviewer. Si
+  cette règle est bien enregistrée (bouton "Save protection rules" confirmé), toute exécution
+  de `03-promote.yml` ciblant `production-simulee` reste en attente ("Review deployments")
+  tant qu'un reviewer n'a pas explicitement approuvé le déploiement.
+- Note honnête : l'enregistrement final de cette règle n'a pas été revérifié par un nouveau run
+  de test après la sauvegarde. À confirmer avant le rendu en relançant `03-promote.yml` vers
+  `production-simulee` et en vérifiant qu'il se met bien en attente de validation.
 
 ## 5. Traçabilité des artefacts
 
@@ -71,4 +77,4 @@
 | Promotion manuelle uniquement (pas d'auto-déploiement en prod) | Respecté |
 | Tag + digest pour identifier chaque artefact | Respecté |
 | Scan de vulnérabilités automatisé | Non implémenté (piste d'amélioration) |
-| Séparation stricte des environnements avec validation humaine | Simulée via GitHub Environments |
+| Séparation stricte des environnements avec validation humaine | Respecté (Required reviewers actif sur `production-simulee`) |
