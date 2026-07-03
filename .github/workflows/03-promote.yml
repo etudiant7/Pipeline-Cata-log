@@ -33,19 +33,17 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   promote:
     name: Promotion de l'artefact vers ${{ inputs.target_environment }}
     runs-on: ubuntu-latest
-    # L'environnement GitHub cible permet d'appliquer une regle de
-    # protection (ex: validation manuelle obligatoire avant execution)
-    # configurable dans Settings > Environments du depot. C'est la
-    # simulation de separation recette / production.
     environment: ${{ inputs.target_environment }}
 
     steps:
+      - name: Normaliser le nom de l'image (Docker exige des minuscules)
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
       - name: Connexion a GHCR avec GITHUB_TOKEN
         uses: docker/login-action@v3
         with:
@@ -62,8 +60,6 @@ jobs:
           docker buildx imagetools create \
             --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.target_environment }} \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ inputs.image_digest }}
-        # imagetools create ne fait que manipuler des manifests dans le
-        # registre : aucune image n'est reconstruite ni re-uploadee.
 
       - name: Verification post-promotion - digest inchange
         run: |
