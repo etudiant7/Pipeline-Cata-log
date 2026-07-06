@@ -50,7 +50,6 @@ docs/                            Documentation complète (cadrage, sécurité,
 Ce dépôt fournit la structure complète, le code et les workflows du projet. Les preuves
 d'exécution réelles (liens vers les runs GitHub Actions, captures d'écran GHCR, tag et digest
 effectifs, etc.) doivent être complétées **après avoir poussé ce dépôt sur votre propre compte
-GitHub et exécuté réellement les workflows**. Les emplacements à compléter sont marqués
-`[À COMPLETER PAR L'ÉTUDIANT]` dans les fichiers de `docs/`.
+GitHub et exécuté réellement les workflows**.
 
 
